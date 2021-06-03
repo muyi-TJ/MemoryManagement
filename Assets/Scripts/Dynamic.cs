@@ -32,6 +32,8 @@ public class Dynamic : MonoBehaviour
 
     public GameObject memoryArea;
     public List<Image> memory;
+    public List<int> memoryBlock = new List<int>();
+    public List<bool> isBusy = new List<bool>();
     void Start()
     {
         next.interactable = false;
@@ -66,7 +68,12 @@ public class Dynamic : MonoBehaviour
             next.interactable = true;
             restart.interactable = true;
         });
+        memoryBlock.Add(0);
+        memoryBlock.Add(64);
+        isBusy.Add(false);
+
         SetFree();
+
     }
 
 
@@ -149,25 +156,17 @@ public class Dynamic : MonoBehaviour
 
     public int GetArea(int size)
     {
-        int start = 0;
-        int num = 0;
-        for (int i = 0; i < memory.Count; i++)
+        for(int i=0;i<isBusy.Count;i++)
         {
-            if (memory[i].color == Color.white)
+            if(!isBusy[i])
             {
-                if (num == 0)
+                if(memoryBlock[i+1]-memoryBlock[i]>=size)
                 {
-                    start = i;
+                    memoryBlock.Insert(i + 1, memoryBlock[i]+size);
+                    isBusy[i] = true;
+                    isBusy.Insert(i + 1, false);
+                    return memoryBlock[i];
                 }
-                num++;
-            }
-            else
-            {
-                num = 0;
-            }
-            if (num == size)
-            {
-                return start;
             }
         }
         return -1;
@@ -175,88 +174,78 @@ public class Dynamic : MonoBehaviour
 
     public int GetFitArea(int size)
     {
-        List<int> start = new List<int>();
-        List<int> compare = new List<int>();
-        int num = 0;
-        int temp = 0;
-        for (int i = 0; i < memory.Count; i++)
+        int minIndex = -1;
+        int present = int.MaxValue;
+        for (int i = 0; i < isBusy.Count; i++)
         {
-            if (memory[i].color == Color.white)
+            if (!isBusy[i])
             {
-                if (num == 0)
+                if (memoryBlock[i + 1] - memoryBlock[i] >= size)
                 {
-                    temp = i;
-                }
-                num++;
-            }
-            else
-            {
-                if (num >= size)
-                {
-                    start.Add(temp);
-                    compare.Add(num);
-                    num = 0;
-                }
-                else
-                {
-                    num = 0;
+                    if(memoryBlock[i + 1] - memoryBlock[i]<present)
+                    {
+                        minIndex = i;
+                    }
                 }
             }
         }
-        if(num>=size)
-        {
-            start.Add(temp);
-            compare.Add(num);
-        }
-        if (start.Count == 0)
+        if(minIndex<0)
         {
             return -1;
         }
-        int min = 0;
-        for (int i = 1; i < compare.Count; i++)
+        else
         {
-            if (compare[i] < compare[min])
-            {
-                min = i;
-            }
+            memoryBlock.Insert(minIndex + 1, memoryBlock[minIndex] + size);
+            isBusy[minIndex] = true;
+            isBusy.Insert(minIndex + 1, false);
+            return memoryBlock[minIndex];
+
         }
-        return start[min];
+
     }
     public void Finish(int index)
     {
-        for (int i = tasks[index].start; i < tasks[index].start + tasks[index].num; i++)
+        int start = tasks[index].start;
+        for (int i = start; i < start + tasks[index].num; i++)
         {
             memory[i].color = Color.white;
         }
+        for(int i=0;i<isBusy.Count;i++)
+        {
+            if(memoryBlock[i]==start)
+            {
+                isBusy[i] = false;
+                if (i + 1 < isBusy.Count)
+                {
+                    if(isBusy[i+1]==false)
+                    {
+                        memoryBlock.RemoveAt(i + 1);
+                        isBusy.RemoveAt(i + 1);
+                    }
+                }
+                if(i-1>=0)
+                {
+                    if(isBusy[i-1]==false)
+                    {
+                        memoryBlock.RemoveAt(i);
+                        isBusy.RemoveAt(i);
+                    }
+                }
+                break;
+            }
+        }
     }
+
 
     void SetFree()
     {
         free.text = "当前空闲的空间为：\n";
-        int start = 0;
-        bool flag = false;
-        for (int i = 0; i < memory.Count; i++)
+        for(int i=0;i<isBusy.Count;i++)
         {
-            if (memory[i].color == Color.white)
+            if(!isBusy[i])
             {
-                if (!flag)
-                {
-                    start = 10 * i;
-                    flag = true;
-                }
+                free.text += (10*memoryBlock[i]).ToString() + "K-" + (10*memoryBlock[i + 1]).ToString() + "K\n";
             }
-            else
-            {
-                if (flag)
-                {
-                    free.text += start.ToString() + "K-" + (i * 10).ToString() + "K\n";
-                    flag = false;
-                }
-            }
-        }
-        if (flag)
-        {
-            free.text += start.ToString() + "K-" + (memory.Count * 10).ToString() + "K\n";
         }
     }
 }
