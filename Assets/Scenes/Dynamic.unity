@@ -3346,7 +3346,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u8FD4\u56DE"
+  m_Text: "\u9000\u51FA"
 --- !u!222 &633050018
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3939,8 +3939,11 @@ MonoBehaviour:
   free: {fileID: 1681925534}
   firstFitButton: {fileID: 1617519000}
   bestFitButton: {fileID: 166135597}
+  count: 0
   memoryArea: {fileID: 1341275276}
   memory: []
+  memoryBlock: 
+  isBusy: 
 --- !u!1 &737400030
 GameObject:
   m_ObjectHideFlags: 0
@@ -5343,7 +5346,7 @@ GameObject:
   - component: {fileID: 998715822}
   - component: {fileID: 998715821}
   m_Layer: 5
-  m_Name: Back
+  m_Name: Quit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7704,8 +7707,8 @@ Camera:
   m_GameObject: {fileID: 1505789791}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0.4745098, g: 0.43397143, b: 0.19215688, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
